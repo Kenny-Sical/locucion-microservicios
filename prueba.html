@@ -6,6 +6,12 @@
     <title>Text to Speech</title>
 </head>
 <body>
+    <label for="voz">Selecciona una voz:</label>
+    <select id="voz">
+        <option value="qWRwExpgG2uefHDT8keg" selected>Hombre</option>
+        <option value="7kdtooVPaSjBW68VJd5q">Mujer</option>
+    </select>
+    <br><br>
     <textarea id="texto" rows="4" cols="50" placeholder="Escribe tu texto"></textarea>
     <br>
     <button onclick="reproducirTexto()">Reproducir</button>
@@ -13,7 +19,7 @@
     <script>
         async function reproducirTexto() {
             const API_KEY = "sk_e8077994bea0d145781c2269a535b2c4a0c39ce0beedbb94";
-            const VOICE_ID = "4YoKCAkojeNJCJ8vME5B";
+            const VOICE_ID = document.getElementById('voz').value;
             const texto = document.getElementById('texto').value;
 
             const url = `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`;
