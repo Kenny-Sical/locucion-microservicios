@@ -1,0 +1,273 @@
+
+  
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: #EDEDED;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+  }
+  
+  .header {
+    display: flex;
+    align-items: center; /* Alinea verticalmente la imagen y el texto */
+    gap: 10px; /* Espaciado entre la imagen y el título */
+    position: absolute;
+    top: 10%;
+    left: 17%; /* Ajusta el margen izquierdo */
+    margin-top: -80px; /* Ajusta este valor según la distancia que quieras */
+
+  }
+  
+  .header img {
+    width: 80px; /* Ajusta el tamaño de la imagen */
+    height: auto;
+  }
+  
+  .header h1 {
+    font-size: 24px;
+    color: #333;
+    margin: 0;
+  }
+  
+  .text-input {
+    background-color: #fff;
+    border-radius: 15px;
+    padding: 10px;
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+  }
+  
+
+
+  
+  .text-input textarea {
+    font-family: 'Inter', sans-serif;
+
+    width: 100%;
+    height: 300px;
+    border: none;
+    outline: none;
+    font-size: 18px;
+    color: #2c2c2c;
+    background-color: white;
+    resize: none; /* Evita que el usuario cambie el tamaño */
+    padding: 10px;
+    border-radius: 10px;
+    
+  }
+  
+  /* Contenedor general */
+    .container {
+      width: 95%;
+      max-width: 800px;
+      background-color: none;
+      padding: 0;
+      position: absolute;
+
+      margin-top: 240px; /* Ajusta este valor según la distancia que quieras */
+
+    }
+  
+ 
+  
+  .logo {
+    width: 100px;
+    height: 100px;
+    background-color: #fff;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 20px;
+  }
+  
+  .logo img {
+    width: 71px;
+    height: 71px;
+  }
+  
+
+  
+  
+  
+  /* Fila de configuraciones */
+  .settings {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    background-color: #D9D5D5;
+    border-radius: 15px;
+    padding: 20px 80px;
+    position: absolute;
+    width: auto; /* Evita cambios de ancho */
+    min-height: 80px; /* Fija una altura mínima */
+    margin-bottom: 430px;
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+  }
+
+  .slider-container {
+    display: flex; /* Siempre visible */
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .slider {
+    width: 100%;
+    cursor: pointer;
+  }
+ 
+  
+  .setting {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .setting p {
+    font-size: 18px;
+    color: #2c2c2c;
+    margin-bottom: 10px;
+  }
+  
+  .dropdown1{
+    background-color: #F06EBA;
+    border-radius: 15px;
+    padding: 13px 40px;
+    border-width: 1px;
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+    font-size: 15px;
+
+  }
+
+  .dropdown2{
+    background-color: #19A6DB;
+    border-radius: 15px;
+    padding: 13px 40px;
+    border-width: 1px;
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+    font-size: 15px;
+
+
+  }
+  .dropdown3{
+    background-color: #D5DE23;
+    border-radius: 15px;
+    padding: 13px 40px;
+    border-width: 1px;
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+    font-size: 15px;
+
+
+  }
+  .dropdown4{
+    background-color: #AFF4C6;
+    border-radius: 15px;
+    padding: 13px 40px;
+    border-width: 1px;
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+    font-size: 15px;
+
+  }
+
+  /* Contenido principal */
+  .content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  /* Área de texto */
+  .text-input {
+    background-color: white;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+  }
+  
+  .text-input p {
+    font-size: 24px;
+    color: #2c2c2c;
+    margin: 0;
+  }
+  
+  /* Botones de acción */
+  .controls {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  
+  .btn1 {
+    background-color: #92DEFA;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 120px;
+    font-size: 18px;
+    color: #2c2c2c;
+    cursor: pointer;
+    box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.50);
+  }
+  
+  .btn2 {
+    background-color: #65F3B8;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 120px;
+    font-size: 18px;
+    color: #2c2c2c;
+    cursor: pointer;
+    box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.50);
+  }
+
+  .btn:hover {
+    background-color: #44abd2; /* efecto hover opcional */
+  }
+  
+  /* Reproductor de audio */
+ 
+  .audio-player {
+    background-color: #ebebeb;
+    border-radius: 10px;
+    padding: 20px 40px; /* Reduce el espacio interno */
+    width: 300px; /* Ancho más pequeño */
+    height: 80px; /* Altura más pequeña */
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
+    display: flex;
+    justify-content: center; /* Centra el reproductor dentro del cuadro */
+    align-items: center;
+    margin-top: 40px;  /* Mueve hacia abajo */
+    margin-left: 200px; /* Mueve a la derecha */
+}
+  
+  .audio-player audio {
+    width: 100%;
+  }
+  
+
+.decorader {
+    position: relative;
+    bottom: -100px;
+    right: -650px;
+    width: 320px;
+    height: auto;
+    
+}
+
+.decoraizq {
+  position: absolute;
+  bottom: -10px;
+  right: 1280px;
+  width: 320px;
+  height: auto;
+  
+}
+
+.escucha {
+  position: absolute;
+  bottom: 80px;
+  right: 355px;
+}
