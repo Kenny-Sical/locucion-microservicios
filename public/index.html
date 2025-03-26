@@ -26,9 +26,6 @@
           <select id="voiceType" class="dropdown1">
             <option value="masculina">Masculina</option>
             <option value="femenina">Femenina</option>
-            <option value="robotica">Robotica</option>
-            <option value="juvenil">Juvenil</option>
-
           </select>
         </div>
         <div class="setting">
@@ -68,13 +65,13 @@
 
       <div class="controls">
         <button class="btn1">Generar Audio</button>
-        <button class="btn2">Descargar Audio</button>
+        <a class="btn2" style="display: none">Descargar Audio</a>
       </div>
     </div>
     <p class="escucha">Escuchar Audio</p>
 
       <div class="audio-player">
-        <audio controls>
+        <audio id="audioPlayer" controls>
 
           <source
             src="https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3"
@@ -90,29 +87,61 @@
 </body>
 
 <script>
-    const volumeDisplay = document.getElementById("volumeDisplay");
-    const sliderContainer = document.getElementById("sliderContainer");
-    const volumeSlider = document.getElementById("volumeSlider");
-  
-    volumeDisplay.addEventListener("click", () => {
-      sliderContainer.style.display = "flex";
-    });
-  
-    volumeSlider.addEventListener("input", () => {
-      let volumeValue = volumeSlider.value;
-      if (volumeValue < 35) {
-        volumeDisplay.textContent = "Bajo";
-      } else if (volumeValue < 70) {
-        volumeDisplay.textContent = "Medio";
-      } else {
-        volumeDisplay.textContent = "Alto";
+  // Función para generar audio
+  async function generarAudio() {
+      const texto = document.querySelector("textarea").value;
+      const tipoVoz = document.getElementById("voiceType").value;
+
+      if (!texto) {
+          alert("Por favor, ingresa un texto.");
+          return;
       }
-    });
-  
+
+      try {
+          // Enviar solicitud al backend
+          const response = await fetch("http://localhost:3000/generar-audio", {
+              method: "POST",
+              headers: {
+                  "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ texto, tipoVoz }),
+          });
+
+          if (!response.ok) {
+              throw new Error("Error en la generación del audio.");
+          }
+
+          // Convertir respuesta a Blob y generar URL
+          const audioBlob = await response.blob();
+          const audioUrl = URL.createObjectURL(audioBlob);
+
+          // Reproducir el audio generado
+          const audio = document.getElementById("audioPlayer");
+          audio.src = audioUrl;
+          audio.play();
+
+          // Mostrar botón de descarga con el archivo
+          const downloadButton = document.querySelector(".btn2");
+          downloadButton.href = audioUrl;
+          downloadButton.download = "audio-generado.mp3";
+          downloadButton.style.display = "inline-block"; // Mostrar botón
+
+      } catch (error) {
+          console.error(error);
+          alert("Ocurrió un error al generar el audio.");
+      }
+  }
+
+  // Asignar la función al botón "Generar Audio"
+  document.querySelector(".btn1").addEventListener("click", generarAudio);
+
+  // Ocultar el botón de descarga al inicio
+  document.addEventListener("DOMContentLoaded", () => {
+      document.querySelector(".btn2").style.display = "none";
+  });
+</script>
 
 
-  
-  </script>
 
 
 

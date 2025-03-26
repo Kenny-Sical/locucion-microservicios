@@ -1,51 +1,68 @@
-const http = require("http");
-const fs = require("fs");
+const express = require("express");
+const cors = require("cors");
+const fetch = require("node-fetch"); // Necesario para hacer requests HTTP
 const path = require("path");
 
-// Crear el servidor
-const server = http.createServer((req, res) => {
-    let filePath = path.join(__dirname, "public", req.url === "/" ? "index.html" : req.url);
-    let extname = path.extname(filePath);
-    let contentType = "text/html";
+const app = express();
+const PORT = 3000;
 
-    // Definir el tipo de contenido
-    switch (extname) {
-        case ".css":
-            contentType = "text/css";
-            break;
-        case ".js":
-            contentType = "text/javascript";
-            break;
-        case ".json":
-            contentType = "application/json";
-            break;
-        case ".png":
-            contentType = "image/png";
-            break;
-        case ".jpg":
-            contentType = "image/jpg";
-            break;
-    }
+// Middleware para manejar JSON y CORS
+app.use(express.json());
+app.use(cors());
 
-    // Leer el archivo
-    fs.readFile(filePath, (err, content) => {
-        if (err) {
-            if (err.code === "ENOENT") {
-                res.writeHead(404, { "Content-Type": "text/html" });
-                res.end("<h1>404 - Página no encontrada</h1>");
-            } else {
-                res.writeHead(500);
-                res.end("Error interno del servidor");
-            }
-        } else {
-            res.writeHead(200, { "Content-Type": contentType });
-            res.end(content, "utf-8");
-        }
-    });
+// Servir archivos estáticos desde la carpeta "public"
+app.use(express.static("public"));
+
+// API Key y URL de ElevenLabs (⚠️ Nunca expongas esto en el frontend)
+const API_KEY = "sk_e8077994bea0d145781c2269a535b2c4a0c39ce0beedbb94";
+const VOICES = {
+  masculina: "qWRwExpgG2uefHDT8keg", // ID de la voz masculina
+  femenina: "7kdtooVPaSjBW68VJd5q",  // ID de la voz femenina
+};
+
+// Ruta principal para servir el index.html
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// Hacer que el servidor escuche en el puerto 3000
-const PORT = 3000;
-server.listen(PORT, () => {
-    console.log(`Servidor ejecutándose en http://localhost:${PORT}`);
+// Endpoint para procesar texto a voz
+app.post("/generar-audio", async (req, res) => {
+  const { texto, tipoVoz } = req.body;
+  const voiceId = VOICES[tipoVoz];
+
+  if (!texto || !voiceId) {
+    return res.status(400).json({ error: "Faltan datos en la solicitud" });
+  }
+
+  try {
+    const url = `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`;
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "xi-api-key": API_KEY,
+      },
+      body: JSON.stringify({
+        text: texto,
+        model_id: "eleven_multilingual_v2",
+        voice_settings: { stability: 0.5, similarity_boost: 0.8 },
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Error en la API de ElevenLabs");
+    }
+
+    const audioBuffer = await response.arrayBuffer();
+    res.setHeader("Content-Type", "audio/mpeg");
+    res.send(Buffer.from(audioBuffer));
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error al procesar el audio" });
+  }
+});
+
+// Iniciar servidor
+app.listen(PORT, () => {
+  console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });
