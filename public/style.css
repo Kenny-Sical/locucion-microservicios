@@ -1,6 +1,3 @@
-
-  
-
   body {
     font-family: 'Inter', sans-serif;
     background-color: #EDEDED;
@@ -40,9 +37,10 @@
     padding: 10px;
     box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
   }
-  
 
-
+  a {
+    text-decoration: none;
+  }
   
   .text-input textarea {
     font-family: 'Inter', sans-serif;
@@ -221,6 +219,7 @@
     color: #2c2c2c;
     cursor: pointer;
     box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.50);
+    text-underline-offset: none;
   }
 
   .btn:hover {
