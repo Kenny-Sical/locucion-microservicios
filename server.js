@@ -27,7 +27,7 @@ app.get("/", (req, res) => {
 
 // Endpoint para procesar texto a voz
 app.post("/generar-audio", async (req, res) => {
-  const { texto, tipoVoz } = req.body;
+  const { texto, tipoVoz, velocidad } = req.body;
   const voiceId = VOICES[tipoVoz];
 
   if (!texto || !voiceId) {
@@ -45,7 +45,11 @@ app.post("/generar-audio", async (req, res) => {
       body: JSON.stringify({
         text: texto,
         model_id: "eleven_multilingual_v2",
-        voice_settings: { stability: 0.5, similarity_boost: 0.8 },
+        voice_settings: { 
+          stability: 0.5, 
+          similarity_boost: 0.8,
+          speed: velocidad // Incluir la velocidad seleccionada
+        },
       }),
     });
 
@@ -61,6 +65,7 @@ app.post("/generar-audio", async (req, res) => {
     res.status(500).json({ error: "Error al procesar el audio" });
   }
 });
+
 
 // Iniciar servidor
 app.listen(PORT, () => {

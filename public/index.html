@@ -31,10 +31,9 @@
         <div class="setting">
           <label for="speed">Velocidad</label>
           <select id="speed" class="dropdown2">
-            <option value="0.5">0.5x</option>
-            <option value="1.0" selected>1.0x</option>
-            <option value="1.5">1.5x</option>
-            <option value="2.0">2.0x</option>
+            <option value="0.7">Lento</option>
+            <option value="1.0" selected>Normal</option>
+            <option value="1.2">Rápido</option>
           </select>
         </div>
         <div class="setting">
@@ -87,50 +86,46 @@
 </body>
 
 <script>
-  // Función para generar audio
+  //Función para generar el audio
   async function generarAudio() {
-      const texto = document.querySelector("textarea").value;
-      const tipoVoz = document.getElementById("voiceType").value;
+    const texto = document.querySelector("textarea").value;
+    const tipoVoz = document.getElementById("voiceType").value;
+    const velocidad = parseFloat(document.getElementById("speed").value); // Capturar la velocidad
 
-      if (!texto) {
-          alert("Por favor, ingresa un texto.");
-          return;
-      }
+    if (!texto) {
+        alert("Por favor, ingresa un texto.");
+        return;
+    }
 
-      try {
-          // Enviar solicitud al backend
-          const response = await fetch("http://localhost:3000/generar-audio", {
-              method: "POST",
-              headers: {
-                  "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ texto, tipoVoz }),
-          });
+    try {
+        const response = await fetch("http://localhost:3000/generar-audio", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ texto, tipoVoz, velocidad }), // Enviar velocidad
+        });
 
-          if (!response.ok) {
-              throw new Error("Error en la generación del audio.");
-          }
+        if (!response.ok) {
+            throw new Error("Error en la generación del audio.");
+        }
 
-          // Convertir respuesta a Blob y generar URL
-          const audioBlob = await response.blob();
-          const audioUrl = URL.createObjectURL(audioBlob);
+        const audioBlob = await response.blob();
+        const audioUrl = URL.createObjectURL(audioBlob);
 
-          // Reproducir el audio generado
-          const audio = document.getElementById("audioPlayer");
-          audio.src = audioUrl;
-          audio.play();
+        const audio = document.getElementById("audioPlayer");
+        audio.src = audioUrl;
+        audio.play();
 
-          // Mostrar botón de descarga con el archivo
-          const downloadButton = document.querySelector(".btn2");
-          downloadButton.href = audioUrl;
-          downloadButton.download = "audio-generado.mp3";
-          downloadButton.style.display = "inline-block"; // Mostrar botón
-
-      } catch (error) {
-          console.error(error);
-          alert("Ocurrió un error al generar el audio.");
-      }
-  }
+        const downloadButton = document.querySelector(".btn2");
+        downloadButton.href = audioUrl;
+        downloadButton.download = "audio-generado.mp3";
+        downloadButton.style.display = "inline-block";
+    } catch (error) {
+        console.error(error);
+        alert("Ocurrió un error al generar el audio.");
+    }
+}
 
   // Asignar la función al botón "Generar Audio"
   document.querySelector(".btn1").addEventListener("click", generarAudio);
