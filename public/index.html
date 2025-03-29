@@ -46,9 +46,9 @@
         <div class="setting">
           <label for="quality">Calidad</label>
           <select id="quality" class="dropdown4">
-            <option value="baja">Baja</option>
-            <option value="media">Media</option>
-            <option value="alta" selected>Alta</option>
+            <option value="mp3">Baja</option>
+            <option value="m4a">Media</option>
+            <option value="wav" selected>Alta</option>
           </select>
         </div>
       </div>
@@ -86,11 +86,12 @@
 </body>
 
 <script>
-  //Función para generar el audio
-  async function generarAudio() {
+  // Función para generar el audio
+async function generarAudio() {
     const texto = document.querySelector("textarea").value;
     const tipoVoz = document.getElementById("voiceType").value;
-    const velocidad = parseFloat(document.getElementById("speed").value); // Capturar la velocidad
+    const velocidad = parseFloat(document.getElementById("speed").value);
+    const formato = document.getElementById("quality").value;
 
     if (!texto) {
         alert("Por favor, ingresa un texto.");
@@ -103,7 +104,7 @@
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ texto, tipoVoz, velocidad }), // Enviar velocidad
+            body: JSON.stringify({ texto, tipoVoz, velocidad, formato }),
         });
 
         if (!response.ok) {
@@ -119,7 +120,7 @@
 
         const downloadButton = document.querySelector(".btn2");
         downloadButton.href = audioUrl;
-        downloadButton.download = "audio-generado.mp3";
+        downloadButton.download = `audio-generado.${formato}`;
         downloadButton.style.display = "inline-block";
     } catch (error) {
         console.error(error);
@@ -127,13 +128,36 @@
     }
 }
 
-  // Asignar la función al botón "Generar Audio"
-  document.querySelector(".btn1").addEventListener("click", generarAudio);
+// Evento para regenerar audio al cambiar el formato
+document.getElementById("quality").addEventListener("change", generarAudio);
 
-  // Ocultar el botón de descarga al inicio
-  document.addEventListener("DOMContentLoaded", () => {
-      document.querySelector(".btn2").style.display = "none";
-  });
+// Evento del botón "Generar Audio"
+document.querySelector(".btn1").addEventListener("click", generarAudio);
+
+// Ocultar el botón de descarga al inicio
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelector(".btn2").style.display = "none";
+});
+
+// Control de volumen
+document.addEventListener("DOMContentLoaded", () => {
+    const volumeSlider = document.getElementById("volumeSlider");
+    const volumeDisplay = document.getElementById("volumeDisplay");
+
+    function actualizarVolumen() {
+        const valor = volumeSlider.value;
+        if (valor < 40) {
+            volumeDisplay.textContent = "Bajo";
+        } else if (valor <= 60) {
+            volumeDisplay.textContent = "Medio";
+        } else {
+            volumeDisplay.textContent = "Alto";
+        }
+    }
+
+    volumeSlider.addEventListener("input", actualizarVolumen);
+    actualizarVolumen();
+});
 </script>
 
 </html>

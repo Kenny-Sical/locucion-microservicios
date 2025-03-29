@@ -27,45 +27,56 @@ app.get("/", (req, res) => {
 
 // Endpoint para procesar texto a voz
 app.post("/generar-audio", async (req, res) => {
-  const { texto, tipoVoz, velocidad } = req.body;
+  const { texto, tipoVoz, velocidad, formato } = req.body;
   const voiceId = VOICES[tipoVoz];
 
   if (!texto || !voiceId) {
-    return res.status(400).json({ error: "Faltan datos en la solicitud" });
+      return res.status(400).json({ error: "Faltan datos en la solicitud" });
   }
+
+  // Validar formato recibido
+  const formatosValidos = ["mp3", "m4a", "wav"];
+  const formatoElegido = formatosValidos.includes(formato) ? formato : "mp3"; // Predeterminado a mp3 si es inválido
 
   try {
-    const url = `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`;
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "xi-api-key": API_KEY,
-      },
-      body: JSON.stringify({
-        text: texto,
-        model_id: "eleven_multilingual_v2",
-        voice_settings: { 
-          stability: 0.5, 
-          similarity_boost: 0.8,
-          speed: velocidad // Incluir la velocidad seleccionada
-        },
-      }),
-    });
+      const url = `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`;
+      const response = await fetch(url, {
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json",
+              "xi-api-key": API_KEY,
+          },
+          body: JSON.stringify({
+              text: texto,
+              model_id: "eleven_multilingual_v2",
+              voice_settings: { 
+                  stability: 0.5, 
+                  similarity_boost: 0.8,
+                  speed: velocidad
+              },
+          }),
+      });
 
-    if (!response.ok) {
-      throw new Error("Error en la API de ElevenLabs");
-    }
+      if (!response.ok) {
+          throw new Error("Error en la API de ElevenLabs");
+      }
 
-    const audioBuffer = await response.arrayBuffer();
-    res.setHeader("Content-Type", "audio/mpeg");
-    res.send(Buffer.from(audioBuffer));
+      const audioBuffer = await response.arrayBuffer();
+
+      // Ajustar el Content-Type dinámicamente según el formato elegido
+      const mimeTypes = {
+          mp3: "audio/mpeg",
+          m4a: "audio/mp4",
+          wav: "audio/wav",
+      };
+
+      res.setHeader("Content-Type", mimeTypes[formatoElegido]);
+      res.send(Buffer.from(audioBuffer));
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Error al procesar el audio" });
+      console.error(error);
+      res.status(500).json({ error: "Error al procesar el audio" });
   }
 });
-
 
 // Iniciar servidor
 app.listen(PORT, () => {
