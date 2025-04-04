@@ -2,6 +2,11 @@ const express = require("express");
 const cors = require("cors");
 const fetch = require("node-fetch"); // Necesario para hacer requests HTTP
 const path = require("path");
+const fs = require('fs');
+const ffmpeg = require('fluent-ffmpeg');
+const ffmpegPath = require('ffmpeg-static').replace('app.asar', 'app.asar.unpacked'); // Solución para Electron/Windows
+ffmpeg.setFfmpegPath(ffmpegPath);
+
 
 const app = express();
 const PORT = 3000;
@@ -27,54 +32,77 @@ app.get("/", (req, res) => {
 
 // Endpoint para procesar texto a voz
 app.post("/generar-audio", async (req, res) => {
-  const { texto, tipoVoz, velocidad, formato } = req.body;
+  const { texto, tipoVoz, velocidad, formato, volumen } = req.body;
   const voiceId = VOICES[tipoVoz];
 
+  // Validación mejorada del volumen
+  const volumenFFmpeg = volumen === '0' ? '0' : `${(volumen / 50).toFixed(2)}`;
+  console.log(`Procesando volumen: ${volumen} -> ${volumenFFmpeg}`); // Debug
+
   if (!texto || !voiceId) {
-      return res.status(400).json({ error: "Faltan datos en la solicitud" });
+    return res.status(400).json({ error: "Faltan datos en la solicitud" });
   }
 
-  // Validar formato recibido
   const formatosValidos = ["mp3", "m4a", "wav"];
-  const formatoElegido = formatosValidos.includes(formato) ? formato : "mp3"; // Predeterminado a mp3 si es inválido
+  const formatoElegido = formatosValidos.includes(formato) ? formato : "mp3";
+  const tempInputPath = path.join(__dirname, `temp-input.${formatoElegido}`);
+  const tempOutputPath = path.join(__dirname, `temp-output.${formatoElegido}`);
 
   try {
-      const url = `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`;
-      const response = await fetch(url, {
-          method: "POST",
-          headers: {
-              "Content-Type": "application/json",
-              "xi-api-key": API_KEY,
-          },
-          body: JSON.stringify({
-              text: texto,
-              model_id: "eleven_multilingual_v2",
-              voice_settings: { 
-                  stability: 0.5, 
-                  similarity_boost: 0.8,
-                  speed: velocidad
-              },
-          }),
-      });
+    // 1. Generar audio con ElevenLabs
+    const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "xi-api-key": API_KEY },
+      body: JSON.stringify({ text: texto, voice_settings: { speed: velocidad } }),
+    });
 
-      if (!response.ok) {
-          throw new Error("Error en la API de ElevenLabs");
-      }
+    if (!response.ok) throw new Error("Error en ElevenLabs");
 
-      const audioBuffer = await response.arrayBuffer();
+    const audioBuffer = await response.arrayBuffer();
+    fs.writeFileSync(tempInputPath, Buffer.from(audioBuffer));
 
-      // Ajustar el Content-Type dinámicamente según el formato elegido
-      const mimeTypes = {
-          mp3: "audio/mpeg",
-          m4a: "audio/mp4",
-          wav: "audio/wav",
-      };
+    // 2. Procesar con FFmpeg
+    await new Promise((resolve, reject) => {
+      const command = ffmpeg(tempInputPath)
+        .audioFilter(`volume=${volumenFFmpeg}`)
+        .on('start', (cmd) => console.log('Comando FFmpeg:', cmd))
+        .on('progress', (progress) => console.log('Progreso:', progress))
+        .on('end', () => {
+          console.log('FFmpeg finalizado exitosamente');
+          resolve();
+        })
+        .on('error', (err) => {
+          console.error('Error FFmpeg:', err);
+          reject(err);
+        });
 
-      res.setHeader("Content-Type", mimeTypes[formatoElegido]);
-      res.send(Buffer.from(audioBuffer));
+      command.save(tempOutputPath);
+    });
+
+    const stats = fs.statSync(tempOutputPath);
+    console.log(`Tamaño archivo procesado: ${stats.size} bytes`);
+
+    // 3. Enviar el audio procesado
+    const processedAudio = fs.readFileSync(tempOutputPath);
+    console.log("Tamaño del audio procesado:", processedAudio.length); // Debug
+  
+    res.setHeader('Content-Type', `audio/${formatoElegido}`);
+    res.setHeader('Content-Length', processedAudio.length);
+    res.send(processedAudio);
+
   } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: "Error al procesar el audio" });
+    console.error('Error completo:', error);
+    if (!res.headersSent) {
+      res.status(500).json({ 
+        error: 'Error al procesar el audio',
+        details: error.message
+      });
+    }
+  } finally {
+    // Limpiar archivos temporales
+    [tempInputPath, tempOutputPath].forEach(file => {
+      if (fs.existsSync(file)) fs.unlinkSync(file);
+    });
   }
 });
 

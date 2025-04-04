@@ -38,9 +38,9 @@
         </div>
         <div class="setting">
             <label for="volume">Volumen</label>
-            <div id="volumeDisplay" class="dropdown3">Medio</div>
+            <div id="volumeDisplay" class="dropdown3">Alto</div>
             <div id="sliderContainer" class="slider-container">
-              <input type="range" id="volumeSlider" class="slider" min="0" max="100" value="50">
+              <input type="range" id="volumeSlider" class="slider" min="0" max="100" value="100">
             </div>
           </div>
         <div class="setting">
@@ -87,45 +87,47 @@
 
 <script>
   // Función para generar el audio
-async function generarAudio() {
-    const texto = document.querySelector("textarea").value;
-    const tipoVoz = document.getElementById("voiceType").value;
-    const velocidad = parseFloat(document.getElementById("speed").value);
-    const formato = document.getElementById("quality").value;
+  async function generarAudio() {
+  try {
+    const response = await fetch("http://localhost:3000/generar-audio", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        texto: document.querySelector("textarea").value,
+        tipoVoz: document.getElementById("voiceType").value,
+        velocidad: parseFloat(document.getElementById("speed").value),
+        formato: document.getElementById("quality").value,
+        volumen: document.getElementById("volumeSlider").value
+      })
+    });
 
-    if (!texto) {
-        alert("Por favor, ingresa un texto.");
-        return;
+    console.log("Estado de la respuesta:", response.status); // Debug
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Error desconocido");
     }
 
-    try {
-        const response = await fetch("http://localhost:3000/generar-audio", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ texto, tipoVoz, velocidad, formato }),
-        });
-
-        if (!response.ok) {
-            throw new Error("Error en la generación del audio.");
-        }
-
-        const audioBlob = await response.blob();
-        const audioUrl = URL.createObjectURL(audioBlob);
-
-        const audio = document.getElementById("audioPlayer");
-        audio.src = audioUrl;
-        audio.play();
-
-        const downloadButton = document.querySelector(".btn2");
-        downloadButton.href = audioUrl;
-        downloadButton.download = `audio-generado.${formato}`;
-        downloadButton.style.display = "inline-block";
-    } catch (error) {
-        console.error(error);
-        alert("Ocurrió un error al generar el audio.");
-    }
+    const blob = await response.blob();
+    console.log("Tamaño del blob recibido:", blob.size); // Debug
+    
+    const url = URL.createObjectURL(blob);
+    
+    // Actualiza el reproductor
+    const audioPlayer = document.getElementById("audioPlayer");
+    audioPlayer.src = url;
+    audioPlayer.load();
+    
+    // Actualiza el botón de descarga
+    const downloadBtn = document.querySelector(".btn2");
+    downloadBtn.href = url;
+    downloadBtn.download = `audio.${document.getElementById("quality").value}`;
+    downloadBtn.style.display = "inline-block";
+    
+  } catch (error) {
+    console.error("Error en generarAudio:", error);
+    alert(`Error: ${error.message}`);
+  }
 }
 
 // Evento para regenerar audio al cambiar el formato
