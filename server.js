@@ -22,7 +22,7 @@ app.use(express.static("public"));
 // API Key y URL de ElevenLabs (⚠️ Nunca expongas esto en el frontend)
 const API_KEY = "sk_e8077994bea0d145781c2269a535b2c4a0c39ce0beedbb94";
 const VOICES = {
-  masculina: "0APrPNs2uS3ExUWZEYZB", // ID de la voz masculina
+  masculina: "0oYniZPgN0nivV3jas1u", // ID de la voz masculina
   femenina: "j3YKABbGYM9c0CVSOioR",  // ID de la voz femenina
 };
 
@@ -33,27 +33,36 @@ app.get("/", (req, res) => {
 
 // Endpoint para procesar texto a voz
 app.post("/generar-audio", async (req, res) => {
-  const { texto, tipoVoz, velocidad, formato, volumen } = req.body;
+  const { texto, tipoVoz, velocidad, formato, volumen, titulo } = req.body; // Añade titulo
   const voiceId = VOICES[tipoVoz];
+  
+  console.log(`Solicitando voz: ${tipoVoz} (ID: ${voiceId})`); // Debug
+
+  if (!voiceId) {
+    return res.status(400).json({ error: "Tipo de voz no válido" });
+  }
 
   // Validación mejorada del volumen (0-100 → 0.0-2.0)
   const volumenFFmpeg = volumen === '0' ? '0' : (volumen / 50).toFixed(2);
   console.log(`Aplicando volumen: ${volumen}% → ${volumenFFmpeg}`);
 
   try {
-    // 1. Generar audio con ElevenLabs
     const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
       method: "POST",
       headers: { 
         "Content-Type": "application/json", 
-        "xi-api-key": API_KEY 
+        "xi-api-key": API_KEY,
+        "accept": "audio/mpeg" // Añade este header
       },
       body: JSON.stringify({
         text: texto,
-        voice_settings: { 
+        model_id: "eleven_multilingual_v2", // Añade modelo
+        voice_settings: {
           stability: 0.5,
           similarity_boost: 0.8,
-          speed: velocidad 
+          speed: velocidad,
+          style: 0.5, // Añade estilo (0-1)
+          use_speaker_boost: true
         }
       })
     });
@@ -81,7 +90,7 @@ app.post("/generar-audio", async (req, res) => {
     
     return res
       .setHeader('Content-Type', `audio/${formato}`)
-      .setHeader('Content-Disposition', `attachment; filename="audio.${formato}"`)
+      .setHeader('Content-Disposition', `attachment; filename="${titulo || 'audio'}.${formato}"`)
       .send(processedAudio);
 
   } catch (error) {
