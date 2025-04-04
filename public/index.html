@@ -57,16 +57,21 @@
 
     <!-- Contenido principal: área de texto, botones de acción y reproductor -->
     <div class="content">
+
+      <div class="name-input">
+        <textarea placeholder="Ingrese nombre del audio"></textarea>
+      </div>
+
         <div class="text-input">
             <textarea placeholder="Ingrese texto..."></textarea>
           </div>
-          
 
       <div class="controls">
         <button class="btn1">Generar Audio</button>
         <a class="btn2" style="display: none">Descargar Audio</a>
       </div>
     </div>
+
     <p class="escucha">Escuchar Audio</p>
 
       <div class="audio-player">
@@ -89,44 +94,39 @@
   // Función para generar el audio
   async function generarAudio() {
   try {
+    // Captura el nombre del archivo (usa "audio" si está vacío)
+    const titulo = document.querySelector(".name-input textarea").value.trim() || "audio";
+    const formato = document.getElementById("quality").value;
+
     const response = await fetch("http://localhost:3000/generar-audio", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        texto: document.querySelector("textarea").value,
+        texto: document.querySelector(".text-input textarea").value,
+        titulo: titulo, // Envía el título al servidor
         tipoVoz: document.getElementById("voiceType").value,
         velocidad: parseFloat(document.getElementById("speed").value),
-        formato: document.getElementById("quality").value,
+        formato: formato,
         volumen: document.getElementById("volumeSlider").value
       })
     });
 
-    console.log("Estado de la respuesta:", response.status); // Debug
-    
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || "Error desconocido");
-    }
-
+    // Actualiza el botón de descarga con el nombre personalizado
     const blob = await response.blob();
-    console.log("Tamaño del blob recibido:", blob.size); // Debug
-    
     const url = URL.createObjectURL(blob);
-    
+    const downloadBtn = document.querySelector(".btn2");
+    downloadBtn.href = url;
+    downloadBtn.download = `${titulo}.${formato}`; // Ej: "mi_titulo.wav"
+    downloadBtn.style.display = "inline-block";
+
     // Actualiza el reproductor
     const audioPlayer = document.getElementById("audioPlayer");
     audioPlayer.src = url;
     audioPlayer.load();
-    
-    // Actualiza el botón de descarga
-    const downloadBtn = document.querySelector(".btn2");
-    downloadBtn.href = url;
-    downloadBtn.download = `audio.${document.getElementById("quality").value}`;
-    downloadBtn.style.display = "inline-block";
-    
+
   } catch (error) {
-    console.error("Error en generarAudio:", error);
-    alert(`Error: ${error.message}`);
+    console.error("Error:", error);
+    alert("Error al generar el audio");
   }
 }
 

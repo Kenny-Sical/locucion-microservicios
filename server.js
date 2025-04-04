@@ -32,7 +32,7 @@ app.get("/", (req, res) => {
 
 // Endpoint para procesar texto a voz
 app.post("/generar-audio", async (req, res) => {
-  const { texto, tipoVoz, velocidad, formato, volumen } = req.body;
+  const { texto, titulo, tipoVoz, velocidad, formato, volumen } = req.body;
   const voiceId = VOICES[tipoVoz];
 
   // Validación mejorada del volumen
@@ -88,6 +88,11 @@ app.post("/generar-audio", async (req, res) => {
   
     res.setHeader('Content-Type', `audio/${formatoElegido}`);
     res.setHeader('Content-Length', processedAudio.length);
+    res.send(processedAudio);
+
+    // Envía el audio con el nombre personalizado
+    res.setHeader("Content-Disposition", `attachment; filename=${titulo || "audio"}.${formatoElegido}`);
+    res.setHeader("Content-Type", `audio/${formatoElegido}`);
     res.send(processedAudio);
 
   } catch (error) {

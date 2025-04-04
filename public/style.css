@@ -46,7 +46,7 @@
     font-family: 'Inter', sans-serif;
 
     width: 100%;
-    height: 300px;
+    height: 210px;
     border: none;
     outline: none;
     font-size: 18px;
@@ -269,4 +269,27 @@
   position: absolute;
   bottom: 80px;
   right: 355px;
+}
+
+.name-input {
+  background-color: #fff;
+  border-radius: 15px;
+  padding: 10px;
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+}
+
+.name-input textarea {
+  font-family: 'Inter', sans-serif;
+
+  width: 50%;
+  height: 25px;
+  border: none;
+  outline: none;
+  font-size: 18px;
+  color: #2c2c2c;
+  background-color: white;
+  resize: none; /* Evita que el usuario cambie el tamaño */
+  padding: 10px;
+  border-radius: 10px;
+  
 }
