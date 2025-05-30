@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Aplicación de Locución</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div class="header">
+        <div class="logo">
+          <!-- Ajusta la ruta de la imagen a tu necesidad -->
+          <img
+            src="https://framerusercontent.com/images/SJFVb9gjnld5UtVXjfRA4XPRNrM.png"
+            alt="Logo"
+          />
+        </div>
+        <h1>Aplicación de Locución</h1>
+      </div>
+
+
+    <!-- Fila de configuraciones (Tipo de voz, Velocidad, Volumen, Calidad) -->
+    <div class="settings">
+        <div class="setting">
+          <label for="voiceType">Tipo de voz</label>
+          <select id="voiceType" class="dropdown1">
+            <option value="masculina">Masculina</option>
+            <option value="femenina">Femenina</option>
+          </select>
+        </div>
+        <div class="setting">
+          <label for="speed">Velocidad</label>
+          <select id="speed" class="dropdown2">
+            <option value="0.7">Lento</option>
+            <option value="1.0" selected>Normal</option>
+            <option value="1.2">Rápido</option>
+          </select>
+        </div>
+        <div class="setting">
+            <label for="volume">Volumen</label>
+            <div id="volumeDisplay" class="dropdown3">Alto</div>
+            <div id="sliderContainer" class="slider-container">
+              <input type="range" id="volumeSlider" class="slider" min="0" max="100" value="100">
+            </div>
+          </div>
+        <div class="setting">
+          <label for="quality">Calidad</label>
+          <select id="quality" class="dropdown4">
+            <option value="mp3">Baja</option>
+            <option value="m4a">Media</option>
+            <option value="wav" selected>Alta</option>
+          </select>
+        </div>
+      </div>
+
+    <div class="container">
+
+    <!-- Contenido principal: área de texto, botones de acción y reproductor -->
+    <div class="content">
+
+      <div class="name-input">
+        <textarea placeholder="Ingrese nombre del audio"></textarea>
+      </div>
+
+        <div class="text-input">
+            <textarea placeholder="Ingrese texto..."></textarea>
+          </div>
+
+      <div class="controls">
+        <button class="btn1">Generar Audio</button>
+        <a class="btn2" style="display: none">Descargar Audio</a>
+      </div>
+    </div>
+
+    <p class="escucha">Escuchar Audio</p>
+
+      <div class="audio-player">
+        <audio id="audioPlayer" controls>
+
+          <source
+            src="https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3"
+            type="audio/mpeg"
+          />
+          Tu navegador no soporta el elemento de audio.
+        </audio>
+      
+    </div>
+  </div>
+  <img src="decoracionder.png" class="decorader">
+  <img src="decoracionizq.png" class="decoraizq">
+</body>
+
+<script src="script.js"></script>
+
+</html>

@@ -1,0 +1,18 @@
+version: "3.8"
+services:
+  config-service:
+    build: ./config-service
+    ports:
+      - "3001:3001"
+
+  convert-service:
+    build: ./convert-service
+    ports:
+      - "3002:3002"
+    depends_on:
+      - config-service
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "8080:80"

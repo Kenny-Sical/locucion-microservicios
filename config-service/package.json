@@ -1,0 +1,16 @@
+{
+  "name": "config-service",
+  "version": "1.0.0",
+  "description": "Microservicio encargado de validar parámetros y devolver configuración de voces.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": ["microservice", "config", "node", "express"],
+  "author": "Equipo CrazyShots",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0"
+  }
+}

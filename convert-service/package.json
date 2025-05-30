@@ -1,0 +1,19 @@
+{
+  "name": "convert-service",
+  "version": "1.0.0",
+  "description": "Microservicio encargado de convertir texto a audio usando ElevenLabs y procesarlo con ffmpeg.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": ["microservice", "text-to-speech", "ffmpeg", "audio", "express"],
+  "author": "Equipo CrazyShots",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "fluent-ffmpeg": "^2.1.3",
+    "node-fetch": "^2.7.0"
+  }
+}
